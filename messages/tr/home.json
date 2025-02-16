@@ -1,6 +1,41 @@
 {
-  "title": "İklim değişikliği sizin sesinizin önemi",
+  "title": "İklim Krizinde Sesiniz Önemlidir",
   "description": "İklim değişikliği konusunda endişeli olan binlerce vatandaşın, düşüncelerinizi paylaşarak farkı yapabileceğiniz bir platformdur.",
   "takeSurvey": "Anketi Al",
-  "learnMore": "Daha Fazla Öğren"
+  "learnMore": "Daha Fazla Öğren",
+  "stats": {
+    "temperature": {
+      "value": "1.5°C",
+      "description": "Önlememiz gereken kritik küresel sıcaklık artışı"
+    },
+    "trees": {
+      "value": "15 Milyar",
+      "description": "Her yıl küresel olarak kesilen ağaç sayısı"
+    },
+    "people": {
+      "value": "7.8 Milyar",
+      "description": "İklim değişikliğinden etkilenen insan sayısı"
+    }
+  },
+  "survey": {
+    "title": "Görüşünüz Önemli",
+    "description": "Kapsamlı anketimiz, küresel ısınma hakkında kamuoyu algısını ve farkındalığını anlamaya yardımcı olur. Yanıtlarınız değerli araştırmalara ve politika önerilerine katkıda bulunacaktır.",
+    "highlights": {
+      "title": "Anket Öne Çıkanlar",
+      "items": {
+        "experience": "İklim değişikliği ile ilgili kişisel deneyimler",
+        "policies": "Çevre politikaları hakkında görüşler",
+        "solutions": "Sürdürülebilir çözümler için fikirler"
+      }
+    },
+    "startButton": "Ankete Başla"
+  },
+  "footer": {
+    "rights": "Tüm hakları saklıdır.",
+    "links": {
+      "privacy": "Gizlilik Politikası",
+      "terms": "Kullanım Koşulları",
+      "contact": "İletişim"
+    }
+  }
 }

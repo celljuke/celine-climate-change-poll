@@ -2,5 +2,40 @@
   "title": "Your Voice Matters in the Climate Crisis",
   "description": "Join thousands of concerned citizens in sharing your thoughts about global warming. Together, we can make a difference.",
   "takeSurvey": "Take Survey",
-  "learnMore": "Learn More"
+  "learnMore": "Learn More",
+  "stats": {
+    "temperature": {
+      "value": "1.5°C",
+      "description": "Critical global temperature rise we must prevent"
+    },
+    "trees": {
+      "value": "15 Billion",
+      "description": "Trees cut down each year globally"
+    },
+    "people": {
+      "value": "7.8 Billion",
+      "description": "People affected by climate change"
+    }
+  },
+  "survey": {
+    "title": "Make Your Opinion Count",
+    "description": "Our comprehensive survey helps understand public perception and awareness about global warming. Your responses will contribute to valuable research and policy recommendations.",
+    "highlights": {
+      "title": "Survey Highlights",
+      "items": {
+        "experience": "Personal experiences with climate change",
+        "policies": "Views on environmental policies",
+        "solutions": "Ideas for sustainable solutions"
+      }
+    },
+    "startButton": "Start Survey Now"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "links": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "contact": "Contact"
+    }
+  }
 }
