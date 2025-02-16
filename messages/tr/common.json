@@ -1,0 +1,9 @@
+{
+  "languages": {
+    "en": "İngilizce",
+    "tr": "Türkçe"
+  },
+  "accessibility": {
+    "selector": "Dil seçiniz"
+  }
+}
