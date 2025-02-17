@@ -3,14 +3,23 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, ThermometerSun, Trees, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
-
+import Image from "next/image";
 export default function Home() {
   const t = useTranslations("home");
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-fuchsia-50">
       {/* Hero Section */}
-      <section className="px-4 pt-20 md:pt-32 pb-16 text-center">
+      <section className="px-4 pt-20 pb-16 text-center">
+        <div className="container flex justify-center mx-auto py-8">
+          <Image
+            src="/cherry-logo.svg"
+            alt="logo"
+            width={512}
+            height={512}
+            className="w-20 h-20"
+          />
+        </div>
         <div className="max-w-3xl mx-auto space-y-8">
           <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-emerald-600 via-fuchsia-500 to-purple-600 text-transparent bg-clip-text">
             {t("title")}
