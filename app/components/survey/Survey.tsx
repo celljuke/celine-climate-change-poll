@@ -27,6 +27,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
+import SurveyCompleted from "@/components/survey-completed";
 
 interface SurveyProps {
   survey: SurveyData;
@@ -66,13 +67,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
 
   // Check if user has already taken the survey
   if (hasTakenSurvey(survey.id)) {
-    return (
-      <Card className="bg-gray-50">
-        <CardContent className="pt-6">
-          <p className="text-center text-gray-600">{t("alreadySubmitted")}</p>
-        </CardContent>
-      </Card>
-    );
+    return <SurveyCompleted />;
   }
 
   const handleNext = () => {
@@ -161,16 +156,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
   };
 
   if (submitted) {
-    return (
-      <Card className="bg-green-50">
-        <CardContent className="pt-6 text-center">
-          <h2 className="text-2xl font-bold text-green-600 mb-2">
-            {t("thankYou")}
-          </h2>
-          <p className="text-green-600">{t("thankYouMessage")}</p>
-        </CardContent>
-      </Card>
-    );
+    return <SurveyCompleted />;
   }
 
   return (
