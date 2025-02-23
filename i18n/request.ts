@@ -9,6 +9,7 @@ export default getRequestConfig(async () => {
     messages: {
       home: (await import(`../messages/${locale}/home.json`)).default,
       common: (await import(`../messages/${locale}/common.json`)).default,
+      survey: (await import(`../messages/${locale}/survey.json`)).default,
     },
   };
 });

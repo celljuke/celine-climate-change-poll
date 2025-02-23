@@ -1,0 +1,18 @@
+{
+  "alreadySubmitted": "Katılımınız için teşekkür ederiz. Bu anketi zaten tamamladınız.",
+  "thankYou": "🎉 Teşekkürler! 🎉",
+  "thankYouMessage": "Yanıtlarınız kaydedildi. Gezegenimizi daha iyi bir yer haline getirmeye katkıda bulunduğunuz için teşekkür ederiz!",
+  "question": "Soru {current} / {total}",
+  "required": "Lütfen bu soruyu cevaplayınız",
+  "submitError": "Anket gönderilirken bir hata oluştu. Lütfen tekrar deneyin.",
+  "validateAllRequired": "Lütfen göndermeden önce tüm gerekli soruları cevaplayın.",
+  "buttons": {
+    "back": "Geri",
+    "next": "İleri",
+    "submit": "Gönder",
+    "submitting": "Gönderiliyor..."
+  },
+  "errors": {
+    "questionNotFound": "Soru bulunamadı: {id}"
+  }
+}

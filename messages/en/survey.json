@@ -1,0 +1,18 @@
+{
+  "alreadySubmitted": "Thank you for your participation. You have already completed this survey.",
+  "thankYou": "🎉 Thank You! 🎉",
+  "thankYouMessage": "Your responses have been recorded. We appreciate your participation in making our planet a better place!",
+  "question": "Question {current} of {total}",
+  "required": "This question requires an answer",
+  "submitError": "An error occurred while submitting the survey. Please try again.",
+  "validateAllRequired": "Please answer all required questions before submitting.",
+  "buttons": {
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "submitting": "Submitting..."
+  },
+  "errors": {
+    "questionNotFound": "Question {id} not found"
+  }
+}

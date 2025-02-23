@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { QuestionComponent } from "./QuestionTypes";
 import { SurveyData, Answer, I18nText } from "./types";
 import { hasTakenSurvey, markSurveyAsTaken } from "./utils";
@@ -39,6 +39,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
   const [submitted, setSubmitted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const locale = useLocale();
+  const t = useTranslations("survey");
   const { fireConfetti } = useConfetti();
 
   const sortedQuestions = survey.questions.sort((a, b) => a.order - b.order);
@@ -57,10 +58,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
     return (
       <Card className="bg-gray-50">
         <CardContent className="pt-6">
-          <p className="text-center text-gray-600">
-            Thank you for your participation. You have already completed this
-            survey.
-          </p>
+          <p className="text-center text-gray-600">{t("alreadySubmitted")}</p>
         </CardContent>
       </Card>
     );
@@ -73,7 +71,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
     if (currentQuestion.required && !value) {
       form.setError(questionId, {
         type: "required",
-        message: "Please answer this question before continuing",
+        message: t("required"),
       });
       return;
     }
@@ -102,7 +100,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
         .map((q) => q.textI18n[locale as keyof I18nText]);
 
       if (unansweredRequired.length > 0) {
-        setError("Please answer all required questions before submitting.");
+        setError(t("validateAllRequired"));
         setIsSubmitting(false);
         return;
       }
@@ -110,7 +108,8 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
       const formattedAnswers: Answer[] = Object.entries(data).map(
         ([questionId, value]) => {
           const question = sortedQuestions.find((q) => q.id === questionId);
-          if (!question) throw new Error(`Question ${questionId} not found`);
+          if (!question)
+            throw new Error(t("errors.questionNotFound", { id: questionId }));
 
           if (question.type === "RATING") {
             return { questionId, ratingValue: value as number };
@@ -127,9 +126,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
       setSubmitted(true);
       fireConfetti();
     } catch (err) {
-      setError(
-        "An error occurred while submitting the survey. Please try again."
-      );
+      setError(t("submitError"));
       console.error("Survey submission error:", err);
     } finally {
       setIsSubmitting(false);
@@ -141,12 +138,9 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
       <Card className="bg-green-50">
         <CardContent className="pt-6 text-center">
           <h2 className="text-2xl font-bold text-green-600 mb-2">
-            🎉 Thank You! 🎉
+            {t("thankYou")}
           </h2>
-          <p className="text-green-600">
-            Your responses have been recorded. We appreciate your participation
-            in making our planet a better place!
-          </p>
+          <p className="text-green-600">{t("thankYouMessage")}</p>
         </CardContent>
       </Card>
     );
@@ -171,7 +165,10 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
         <div className="relative">
           <Progress value={progress} className="h-2" />
           <span className="absolute right-0 top-4 text-sm text-gray-500">
-            Question {currentQuestionIndex + 1} of {sortedQuestions.length}
+            {t("question", {
+              current: currentQuestionIndex + 1,
+              total: sortedQuestions.length,
+            })}
           </span>
         </div>
 
@@ -230,7 +227,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
                   className="w-[100px]"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back
+                  {t("buttons.back")}
                 </Button>
                 {isLastQuestion ? (
                   <Button
@@ -238,7 +235,9 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
                     disabled={isSubmitting}
                     className="w-[100px]"
                   >
-                    {isSubmitting ? "Submitting..." : "Submit"}
+                    {isSubmitting
+                      ? t("buttons.submitting")
+                      : t("buttons.submit")}
                   </Button>
                 ) : (
                   <Button
@@ -246,7 +245,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
                     onClick={handleNext}
                     className="w-[100px]"
                   >
-                    Next
+                    {t("buttons.next")}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 )}
