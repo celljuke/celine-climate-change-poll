@@ -160,118 +160,120 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 sm:space-y-12 p-4 sm:p-0 font-sans">
-      <Card className="shadow-sm">
-        <CardHeader className="p-4 sm:p-6">
-          <CardTitle className="text-2xl sm:text-3xl text-center">
-            {survey.titleI18n[locale as keyof I18nText]}
-          </CardTitle>
-          {survey.descriptionI18n && (
-            <CardDescription className="text-base sm:text-lg text-center mt-2">
-              {survey.descriptionI18n[locale as keyof I18nText]}
-            </CardDescription>
+    <div className="w-full max-w-3xl mx-auto">
+      <div className="space-y-12">
+        <Card className="shadow-sm">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-2xl sm:text-3xl text-center">
+              {survey.titleI18n[locale as keyof I18nText]}
+            </CardTitle>
+            {survey.descriptionI18n && (
+              <CardDescription className="text-base sm:text-lg text-center mt-2">
+                {survey.descriptionI18n[locale as keyof I18nText]}
+              </CardDescription>
+            )}
+          </CardHeader>
+        </Card>
+
+        <div className="space-y-10">
+          <div className="relative px-1">
+            <Progress value={progress} className="h-2" />
+            <span className="absolute right-0 top-4 text-xs sm:text-sm text-gray-500">
+              {t("question", {
+                current: currentQuestionIndex + 1,
+                total: sortedQuestions.length,
+              })}
+            </span>
+          </div>
+
+          {error && (
+            <Alert variant="destructive" className="mx-1">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )}
-        </CardHeader>
-      </Card>
 
-      <div className="space-y-6 sm:space-y-10">
-        <div className="relative px-1">
-          <Progress value={progress} className="h-2" />
-          <span className="absolute right-0 top-4 text-xs sm:text-sm text-gray-500">
-            {t("question", {
-              current: currentQuestionIndex + 1,
-              total: sortedQuestions.length,
-            })}
-          </span>
-        </div>
-
-        {error && (
-          <Alert variant="destructive" className="mx-1">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        <Form {...form}>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <Card
-              className={cn(
-                "transition-all duration-300 transform shadow-sm",
-                form.formState.errors[currentQuestion.id] &&
-                  "border-red-500 shadow-[0_0_0_1px_rgba(239,68,68,1)]"
-              )}
-            >
-              <CardHeader className="pb-2 sm:pb-4 p-4 sm:p-6">
-                <CardTitle className="text-xl sm:text-2xl leading-tight">
-                  {currentQuestion.textI18n[locale as keyof I18nText]}
-                  {currentQuestion.required && (
-                    <span className="text-red-500 text-base sm:text-lg ml-1">
-                      *
-                    </span>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 sm:p-6 pt-2 sm:pt-4">
-                <FormField
-                  control={form.control}
-                  name={currentQuestion.id}
-                  rules={{ required: currentQuestion.required }}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <QuestionComponent
-                          question={currentQuestion}
-                          value={field.value}
-                          onChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormMessage className="text-sm mt-2" />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-              <CardFooter className="flex justify-between p-4 sm:p-6 pt-4 sm:pt-6 space-x-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handlePrevious}
-                  disabled={isFirstQuestion}
-                  className="min-w-[90px] sm:w-[100px] text-sm"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  {t("buttons.back")}
-                </Button>
-                {isLastQuestion ? (
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting || !canProceed}
-                    className={cn(
-                      "min-w-[90px] sm:w-[100px] text-sm",
-                      !canProceed && "opacity-50 cursor-not-allowed"
+          <Form {...form}>
+            <form onSubmit={handleSubmit}>
+              <Card
+                className={cn(
+                  "transition-all duration-300 transform shadow-sm",
+                  form.formState.errors[currentQuestion.id] &&
+                    "border-red-500 shadow-[0_0_0_1px_rgba(239,68,68,1)]"
+                )}
+              >
+                <CardHeader className="pb-2 sm:pb-4 p-4 sm:p-6">
+                  <CardTitle className="text-xl sm:text-2xl leading-tight">
+                    {currentQuestion.textI18n[locale as keyof I18nText]}
+                    {currentQuestion.required && (
+                      <span className="text-red-500 text-base sm:text-lg ml-1 align-top">
+                        *
+                      </span>
                     )}
-                  >
-                    {isSubmitting
-                      ? t("buttons.submitting")
-                      : t("buttons.submit")}
-                  </Button>
-                ) : (
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 pt-2 sm:pt-4">
+                  <FormField
+                    control={form.control}
+                    name={currentQuestion.id}
+                    rules={{ required: currentQuestion.required }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <QuestionComponent
+                            question={currentQuestion}
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-sm mt-2" />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+                <CardFooter className="flex justify-between p-4 sm:p-6 pt-4 sm:pt-6">
                   <Button
                     type="button"
-                    onClick={handleNext}
-                    disabled={!canProceed}
-                    className={cn(
-                      "min-w-[90px] sm:w-[100px] text-sm",
-                      !canProceed && "opacity-50 cursor-not-allowed"
-                    )}
+                    variant="outline"
+                    onClick={handlePrevious}
+                    disabled={isFirstQuestion}
+                    className="min-w-[90px] sm:w-[100px] text-sm"
                   >
-                    {t("buttons.next")}
-                    <ArrowRight className="h-4 w-4 ml-2" />
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    {t("buttons.back")}
                   </Button>
-                )}
-              </CardFooter>
-            </Card>
-          </form>
-        </Form>
+                  {isLastQuestion ? (
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting || !canProceed}
+                      className={cn(
+                        "min-w-[90px] sm:w-[100px] text-sm",
+                        !canProceed && "opacity-50 cursor-not-allowed"
+                      )}
+                    >
+                      {isSubmitting
+                        ? t("buttons.submitting")
+                        : t("buttons.submit")}
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      onClick={handleNext}
+                      disabled={!canProceed}
+                      className={cn(
+                        "min-w-[90px] sm:w-[100px] text-sm",
+                        !canProceed && "opacity-50 cursor-not-allowed"
+                      )}
+                    >
+                      {t("buttons.next")}
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  )}
+                </CardFooter>
+              </Card>
+            </form>
+          </Form>
+        </div>
       </div>
     </div>
   );

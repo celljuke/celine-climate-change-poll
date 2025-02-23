@@ -17,8 +17,8 @@ export default function SurveyCompleted() {
   ];
 
   return (
-    <div className="flex min-h-[400px] items-center justify-center p-4">
-      <Card className="relative max-w-md overflow-hidden p-8 text-center">
+    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
+      <Card className="relative w-full max-w-md overflow-hidden p-6 sm:p-8 text-center">
         {/* Rainbow gradient background */}
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#FF6B6B] via-[#4ECDC4] to-[#FFD93D] opacity-20" />
 
@@ -26,7 +26,7 @@ export default function SurveyCompleted() {
         {[...Array(8)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute h-8 w-8 rounded-full"
+            className="absolute h-6 w-6 sm:h-8 sm:w-8 rounded-full"
             style={{
               background: colors[i % colors.length],
               top: "50%",
@@ -34,8 +34,8 @@ export default function SurveyCompleted() {
               opacity: 0.3,
             }}
             animate={{
-              x: Math.random() * 400 - 200,
-              y: Math.random() * 400 - 200,
+              x: Math.random() * 300 - 150,
+              y: Math.random() * 300 - 150,
               scale: [1, 1.2, 1],
             }}
             transition={{
@@ -56,7 +56,7 @@ export default function SurveyCompleted() {
             stiffness: 260,
             damping: 20,
           }}
-          className="relative flex flex-col items-center gap-6"
+          className="relative flex flex-col items-center gap-4 sm:gap-6"
         >
           {/* Trophy emoji with glow effect */}
           <motion.div
@@ -69,7 +69,7 @@ export default function SurveyCompleted() {
             className="relative"
           >
             <div className="relative">
-              <span className="block text-8xl">🏆</span>
+              <span className="block text-6xl sm:text-8xl">🏆</span>
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{
@@ -85,12 +85,12 @@ export default function SurveyCompleted() {
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="space-y-4"
+            className="space-y-3 sm:space-y-4"
           >
-            <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#FFD93D] bg-clip-text text-transparent">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#FFD93D] bg-clip-text text-transparent">
               {t("thankYou")} 🎉
             </h2>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-lg sm:text-xl text-muted-foreground">
               {t("alreadySubmitted")}
             </p>
           </motion.div>
@@ -105,8 +105,8 @@ export default function SurveyCompleted() {
                 animate={{
                   opacity: [0, 1, 0],
                   scale: [0, 1, 0],
-                  x: Math.random() * 400 - 200,
-                  y: Math.random() * 400 - 200,
+                  x: Math.random() * 300 - 150,
+                  y: Math.random() * 300 - 150,
                 }}
                 transition={{
                   duration: 2,
@@ -116,7 +116,7 @@ export default function SurveyCompleted() {
                 }}
               >
                 <Star
-                  className="h-6 w-6"
+                  className="h-4 w-4 sm:h-6 sm:w-6"
                   fill={colors[i % colors.length]}
                   stroke={colors[i % colors.length]}
                 />
@@ -128,7 +128,7 @@ export default function SurveyCompleted() {
           {[...Array(30)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute h-2 w-2 rounded-full"
+              className="absolute h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full"
               style={{
                 background: colors[i % colors.length],
                 top: "50%",
@@ -137,8 +137,8 @@ export default function SurveyCompleted() {
               initial={{ scale: 0 }}
               animate={{
                 scale: [0, 1, 0],
-                x: Math.random() * 400 - 200,
-                y: Math.random() * 400 - 200,
+                x: Math.random() * 300 - 150,
+                y: Math.random() * 300 - 150,
                 opacity: [0, 1, 0],
               }}
               transition={{
@@ -151,7 +151,7 @@ export default function SurveyCompleted() {
           ))}
 
           {/* Fun emojis */}
-          <div className="flex gap-4 text-2xl">
+          <div className="flex gap-3 sm:gap-4 text-xl sm:text-2xl">
             {["🌟", "🎈", "🎨", "✨"].map((emoji, i) => (
               <motion.span
                 key={i}

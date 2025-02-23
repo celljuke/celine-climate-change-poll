@@ -10,7 +10,7 @@ export const TopBar = () => {
   return (
     <div
       className={cn(
-        "sticky top-0 z-50 w-full bg-emerald-50",
+        "sticky top-0 z-50 w-full bg-emerald-50 px-4",
         "backdrop-blur supports-[backdrop-filter]:bg-emerald-50"
       )}
     >
