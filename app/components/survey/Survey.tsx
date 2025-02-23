@@ -8,7 +8,13 @@ import { hasTakenSurvey, markSurveyAsTaken } from "./utils";
 import { useConfetti } from "@/app/hooks/useConfetti";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -16,6 +22,9 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SurveyProps {
   survey: SurveyData;
@@ -29,8 +38,19 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
   const locale = useLocale();
   const { fireConfetti } = useConfetti();
 
+  // Create validation schema based on required questions
+  const requiredFields = survey.questions.reduce((acc, question) => {
+    if (question.required) {
+      acc[question.id] = {
+        required: `${question.textI18n[locale as keyof I18nText]} is required`,
+      };
+    }
+    return acc;
+  }, {} as Record<string, { required: string }>);
+
   const form = useForm<Record<string, string | number | string[]>>({
     defaultValues: {},
+    mode: "onChange", // Enable real-time validation
   });
 
   // Check if user has already taken the survey
@@ -60,11 +80,12 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
         .map((q) => q.textI18n[locale as keyof I18nText]);
 
       if (unansweredRequired.length > 0) {
-        setError(
-          `Please answer the following required questions: ${unansweredRequired.join(
-            ", "
-          )}`
-        );
+        unansweredRequired.forEach((question) => {
+          form.setError(question, {
+            type: "required",
+            message: "This question requires an answer",
+          });
+        });
         setIsSubmitting(false);
         return;
       }
@@ -83,7 +104,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
           } else if (question.type === "MULTIPLE_CHOICE") {
             return {
               questionId,
-              optionId: (value as string[])[0], // Take first selected option
+              optionId: (value as string[])[0],
             };
           } else {
             return {
@@ -124,25 +145,28 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
     );
   }
 
+  const hasErrors = Object.keys(form.formState.errors).length > 0;
+
   return (
     <div className="max-w-2xl mx-auto space-y-6 font-sans">
       <Card>
         <CardHeader>
-          <CardTitle>{survey.titleI18n[locale as keyof I18nText]}</CardTitle>
+          <CardTitle className="text-2xl">
+            {survey.titleI18n[locale as keyof I18nText]}
+          </CardTitle>
           {survey.descriptionI18n && (
-            <p className="text-gray-600">
+            <CardDescription className="text-base">
               {survey.descriptionI18n[locale as keyof I18nText]}
-            </p>
+            </CardDescription>
           )}
         </CardHeader>
       </Card>
 
       {error && (
-        <Card className="bg-red-50 border-red-200">
-          <CardContent className="pt-6">
-            <p className="text-red-600">{error}</p>
-          </CardContent>
-        </Card>
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
 
       <Form {...form}>
@@ -150,12 +174,21 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
           {survey.questions
             .sort((a, b) => a.order - b.order)
             .map((question) => (
-              <Card key={question.id}>
-                <CardHeader>
-                  <CardTitle className="text-lg">
-                    {question.textI18n[locale as keyof I18nText]}
+              <Card
+                key={question.id}
+                className={cn(
+                  "transition-all duration-200",
+                  form.formState.errors[question.id] &&
+                    "border-red-500 shadow-[0_0_0_1px_rgba(239,68,68,1)]"
+                )}
+              >
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg flex items-start gap-2">
+                    <span>{question.textI18n[locale as keyof I18nText]}</span>
                     {question.required && (
-                      <span className="text-red-500 ml-1">*</span>
+                      <span className="text-red-500 text-sm leading-tight">
+                        *
+                      </span>
                     )}
                   </CardTitle>
                 </CardHeader>
@@ -163,6 +196,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
                   <FormField
                     control={form.control}
                     name={question.id}
+                    rules={requiredFields[question.id]}
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
@@ -172,7 +206,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
                             onChange={field.onChange}
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-sm mt-2" />
                       </FormItem>
                     )}
                   />
@@ -180,11 +214,22 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
               </Card>
             ))}
 
+          {hasErrors && !form.formState.isSubmitted && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Please answer all required questions marked with an asterisk
+                (*).
+              </AlertDescription>
+            </Alert>
+          )}
+
           <Button
             type="submit"
             className="w-full"
             disabled={isSubmitting}
             variant="default"
+            size="lg"
           >
             {isSubmitting ? "Submitting..." : "Submit Survey"}
           </Button>
