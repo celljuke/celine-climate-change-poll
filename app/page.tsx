@@ -1,11 +1,20 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, ThermometerSun, Trees, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+
 export default function Home() {
   const t = useTranslations("home");
+  const router = useRouter();
+
+  const handleStartSurvey = () => {
+    router.push("/global-warming");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-fuchsia-50">
@@ -29,6 +38,7 @@ export default function Home() {
             <Button
               size="lg"
               className="bg-gradient-to-r from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800"
+              onClick={handleStartSurvey}
             >
               {t("survey.startButton")} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -103,6 +113,7 @@ export default function Home() {
               <Button
                 size="lg"
                 className="w-full bg-gradient-to-r from-emerald-500 via-fuchsia-500 to-purple-500 hover:from-emerald-600 hover:via-fuchsia-600 hover:to-purple-600"
+                onClick={handleStartSurvey}
               >
                 {t("survey.startButton")}
               </Button>
