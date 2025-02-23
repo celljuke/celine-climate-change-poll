@@ -53,6 +53,17 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
     mode: "onChange",
   });
 
+  // Check if current question is answered
+  const isCurrentQuestionAnswered = () => {
+    const value = form.getValues(currentQuestion.id);
+    if (!value) return false;
+    if (Array.isArray(value) && value.length === 0) return false;
+    return true;
+  };
+
+  // Check if current question is valid to proceed
+  const canProceed = !currentQuestion.required || isCurrentQuestionAnswered();
+
   // Check if user has already taken the survey
   if (hasTakenSurvey(survey.id)) {
     return (
@@ -64,7 +75,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
     );
   }
 
-  const handleNext = async () => {
+  const handleNext = () => {
     const questionId = currentQuestion.id;
     const value = form.getValues(questionId);
 
@@ -87,26 +98,26 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
     }
   };
 
-  const handleSubmit = async (
-    data: Record<string, string | number | string[]>
-  ) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Check if the last question is answered
+    if (!isCurrentQuestionAnswered()) {
+      form.setError(currentQuestion.id, {
+        type: "required",
+        message: t("required"),
+      });
+      return;
+    }
+
     try {
       setError(null);
       setIsSubmitting(true);
 
-      // Validate all required questions before final submission
-      const unansweredRequired = sortedQuestions
-        .filter((q) => q.required && !data[q.id])
-        .map((q) => q.textI18n[locale as keyof I18nText]);
-
-      if (unansweredRequired.length > 0) {
-        setError(t("validateAllRequired"));
-        setIsSubmitting(false);
-        return;
-      }
+      const formData = form.getValues();
 
       // Format answers for submission
-      const formattedAnswers: Answer[] = Object.entries(data)
+      const formattedAnswers: Answer[] = Object.entries(formData)
         .filter(([, value]) => value !== undefined && value !== null) // Filter out empty answers
         .map(([questionId, value]) => {
           const question = sortedQuestions.find((q) => q.id === questionId);
@@ -196,10 +207,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
         )}
 
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-6"
-          >
+          <form onSubmit={handleSubmit} className="space-y-6">
             <Card
               className={cn(
                 "transition-all duration-300 transform",
@@ -248,8 +256,11 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
                 {isLastQuestion ? (
                   <Button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="w-[100px]"
+                    disabled={isSubmitting || !canProceed}
+                    className={cn(
+                      "w-[100px]",
+                      !canProceed && "opacity-50 cursor-not-allowed"
+                    )}
                   >
                     {isSubmitting
                       ? t("buttons.submitting")
@@ -259,7 +270,11 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
                   <Button
                     type="button"
                     onClick={handleNext}
-                    className="w-[100px]"
+                    disabled={!canProceed}
+                    className={cn(
+                      "w-[100px]",
+                      !canProceed && "opacity-50 cursor-not-allowed"
+                    )}
                   >
                     {t("buttons.next")}
                     <ArrowRight className="w-4 h-4 ml-2" />
