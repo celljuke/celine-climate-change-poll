@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   Form,
@@ -23,8 +24,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Progress } from "@/components/ui/progress";
 
 interface SurveyProps {
   survey: SurveyData;
@@ -35,22 +37,19 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const locale = useLocale();
   const { fireConfetti } = useConfetti();
 
-  // Create validation schema based on required questions
-  const requiredFields = survey.questions.reduce((acc, question) => {
-    if (question.required) {
-      acc[question.id] = {
-        required: `${question.textI18n[locale as keyof I18nText]} is required`,
-      };
-    }
-    return acc;
-  }, {} as Record<string, { required: string }>);
+  const sortedQuestions = survey.questions.sort((a, b) => a.order - b.order);
+  const currentQuestion = sortedQuestions[currentQuestionIndex];
+  const isLastQuestion = currentQuestionIndex === sortedQuestions.length - 1;
+  const isFirstQuestion = currentQuestionIndex === 0;
+  const progress = ((currentQuestionIndex + 1) / sortedQuestions.length) * 100;
 
   const form = useForm<Record<string, string | number | string[]>>({
     defaultValues: {},
-    mode: "onChange", // Enable real-time validation
+    mode: "onChange",
   });
 
   // Check if user has already taken the survey
@@ -67,6 +66,29 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
     );
   }
 
+  const handleNext = () => {
+    const questionId = currentQuestion.id;
+    const value = form.getValues(questionId);
+
+    if (currentQuestion.required && !value) {
+      form.setError(questionId, {
+        type: "required",
+        message: "Please answer this question before continuing",
+      });
+      return;
+    }
+
+    if (currentQuestionIndex < sortedQuestions.length - 1) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex((prev) => prev - 1);
+    }
+  };
+
   const handleSubmit = async (
     data: Record<string, string | number | string[]>
   ) => {
@@ -74,43 +96,28 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
     setIsSubmitting(true);
 
     try {
-      // Validate required questions
-      const unansweredRequired = survey.questions
+      // Validate all required questions before final submission
+      const unansweredRequired = sortedQuestions
         .filter((q) => q.required && !data[q.id])
         .map((q) => q.textI18n[locale as keyof I18nText]);
 
       if (unansweredRequired.length > 0) {
-        unansweredRequired.forEach((question) => {
-          form.setError(question, {
-            type: "required",
-            message: "This question requires an answer",
-          });
-        });
+        setError("Please answer all required questions before submitting.");
         setIsSubmitting(false);
         return;
       }
 
-      // Format answers for submission
       const formattedAnswers: Answer[] = Object.entries(data).map(
         ([questionId, value]) => {
-          const question = survey.questions.find((q) => q.id === questionId);
+          const question = sortedQuestions.find((q) => q.id === questionId);
           if (!question) throw new Error(`Question ${questionId} not found`);
 
           if (question.type === "RATING") {
-            return {
-              questionId,
-              ratingValue: value as number,
-            };
+            return { questionId, ratingValue: value as number };
           } else if (question.type === "MULTIPLE_CHOICE") {
-            return {
-              questionId,
-              optionId: (value as string[])[0],
-            };
+            return { questionId, optionId: (value as string[])[0] };
           } else {
-            return {
-              questionId,
-              optionId: value as string,
-            };
+            return { questionId, optionId: value as string };
           }
         }
       );
@@ -145,96 +152,109 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
     );
   }
 
-  const hasErrors = Object.keys(form.formState.errors).length > 0;
-
   return (
-    <div className="max-w-2xl mx-auto space-y-6 font-sans">
+    <div className="max-w-3xl mx-auto space-y-12 font-sans">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">
+          <CardTitle className="text-3xl text-center">
             {survey.titleI18n[locale as keyof I18nText]}
           </CardTitle>
           {survey.descriptionI18n && (
-            <CardDescription className="text-base">
+            <CardDescription className="text-lg text-center mt-2">
               {survey.descriptionI18n[locale as keyof I18nText]}
             </CardDescription>
           )}
         </CardHeader>
       </Card>
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+      <div className="space-y-10">
+        <div className="relative">
+          <Progress value={progress} className="h-2" />
+          <span className="absolute right-0 top-4 text-sm text-gray-500">
+            Question {currentQuestionIndex + 1} of {sortedQuestions.length}
+          </span>
+        </div>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-          {survey.questions
-            .sort((a, b) => a.order - b.order)
-            .map((question) => (
-              <Card
-                key={question.id}
-                className={cn(
-                  "transition-all duration-200",
-                  form.formState.errors[question.id] &&
-                    "border-red-500 shadow-[0_0_0_1px_rgba(239,68,68,1)]"
-                )}
-              >
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg flex items-start gap-2">
-                    <span>{question.textI18n[locale as keyof I18nText]}</span>
-                    {question.required && (
-                      <span className="text-red-500 text-sm leading-tight">
-                        *
-                      </span>
-                    )}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <FormField
-                    control={form.control}
-                    name={question.id}
-                    rules={requiredFields[question.id]}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <QuestionComponent
-                            question={question}
-                            value={field.value}
-                            onChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormMessage className="text-sm mt-2" />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
-            ))}
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-          {hasErrors && !form.formState.isSubmitted && (
-            <Alert variant="destructive" className="mt-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                Please answer all required questions marked with an asterisk
-                (*).
-              </AlertDescription>
-            </Alert>
-          )}
-
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isSubmitting}
-            variant="default"
-            size="lg"
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-6"
           >
-            {isSubmitting ? "Submitting..." : "Submit Survey"}
-          </Button>
-        </form>
-      </Form>
+            <Card
+              className={cn(
+                "transition-all duration-300 transform",
+                form.formState.errors[currentQuestion.id] &&
+                  "border-red-500 shadow-[0_0_0_1px_rgba(239,68,68,1)]"
+              )}
+            >
+              <CardHeader className="pb-4">
+                <CardTitle className="text-2xl">
+                  {currentQuestion.textI18n[locale as keyof I18nText]}
+                  {currentQuestion.required && (
+                    <span className="text-red-500 text-lg ml-1">*</span>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <FormField
+                  control={form.control}
+                  name={currentQuestion.id}
+                  rules={{ required: currentQuestion.required }}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <QuestionComponent
+                          question={currentQuestion}
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-sm mt-2" />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+              <CardFooter className="flex justify-between pt-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handlePrevious}
+                  disabled={isFirstQuestion}
+                  className="w-[100px]"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
+                </Button>
+                {isLastQuestion ? (
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-[100px]"
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit"}
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={handleNext}
+                    className="w-[100px]"
+                  >
+                    Next
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                )}
+              </CardFooter>
+            </Card>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 };
