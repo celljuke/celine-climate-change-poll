@@ -42,14 +42,16 @@ export const MultipleChoiceQuestion: React.FC<QuestionProps> = ({
   onChange,
   value,
 }) => {
-  const selectedValues = (value as string[]) || [];
   const locale = useLocale();
+  // Ensure value is always an array
+  const selectedValues = Array.isArray(value) ? value : [];
 
   const handleChange = (checked: boolean, optionId: string) => {
-    const newValues = checked
-      ? [...selectedValues, optionId]
-      : selectedValues.filter((v) => v !== optionId);
-    onChange(newValues);
+    if (checked) {
+      onChange([...selectedValues, optionId]);
+    } else {
+      onChange(selectedValues.filter((v) => v !== optionId));
+    }
   };
 
   return (

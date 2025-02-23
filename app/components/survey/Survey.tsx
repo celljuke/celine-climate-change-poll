@@ -64,7 +64,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
     );
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const questionId = currentQuestion.id;
     const value = form.getValues(questionId);
 
@@ -90,10 +90,10 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
   const handleSubmit = async (
     data: Record<string, string | number | string[]>
   ) => {
-    setError(null);
-    setIsSubmitting(true);
-
     try {
+      setError(null);
+      setIsSubmitting(true);
+
       // Validate all required questions before final submission
       const unansweredRequired = sortedQuestions
         .filter((q) => q.required && !data[q.id])
@@ -105,29 +105,45 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
         return;
       }
 
-      const formattedAnswers: Answer[] = Object.entries(data).map(
-        ([questionId, value]) => {
+      // Format answers for submission
+      const formattedAnswers: Answer[] = Object.entries(data)
+        .filter(([, value]) => value !== undefined && value !== null) // Filter out empty answers
+        .map(([questionId, value]) => {
           const question = sortedQuestions.find((q) => q.id === questionId);
           if (!question)
             throw new Error(t("errors.questionNotFound", { id: questionId }));
 
           if (question.type === "RATING") {
-            return { questionId, ratingValue: value as number };
+            return {
+              questionId,
+              ratingValue: Number(value),
+            };
           } else if (question.type === "MULTIPLE_CHOICE") {
-            return { questionId, optionId: (value as string[])[0] };
+            const selectedValues = Array.isArray(value) ? value : [value];
+            return {
+              questionId,
+              optionId: selectedValues[0]?.toString(),
+            };
           } else {
-            return { questionId, optionId: value as string };
+            return {
+              questionId,
+              optionId: String(value),
+            };
           }
-        }
-      );
+        });
+
+      if (formattedAnswers.length === 0) {
+        setError(t("validateAllRequired"));
+        return;
+      }
 
       await onSubmit(formattedAnswers);
       markSurveyAsTaken(survey.id);
       setSubmitted(true);
       fireConfetti();
     } catch (err) {
-      setError(t("submitError"));
       console.error("Survey submission error:", err);
+      setError(t("submitError"));
     } finally {
       setIsSubmitting(false);
     }
