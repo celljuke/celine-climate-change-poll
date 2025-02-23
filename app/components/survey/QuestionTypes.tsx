@@ -23,12 +23,15 @@ export const SingleChoiceQuestion: React.FC<QuestionProps> = ({
     <RadioGroup
       value={value as string}
       onValueChange={onChange}
-      className="space-y-3"
+      className="space-y-4"
     >
       {question.options.map((option: OptionData) => (
-        <div key={option.id} className="flex items-center space-x-2">
-          <RadioGroupItem value={option.id} id={option.id} />
-          <Label htmlFor={option.id} className="text-sm font-normal">
+        <div key={option.id} className="flex items-start space-x-3">
+          <RadioGroupItem value={option.id} id={option.id} className="mt-0.5" />
+          <Label
+            htmlFor={option.id}
+            className="text-sm sm:text-base font-normal leading-tight"
+          >
             {option.textI18n[locale as keyof I18nText]}
           </Label>
         </div>
@@ -43,7 +46,6 @@ export const MultipleChoiceQuestion: React.FC<QuestionProps> = ({
   value,
 }) => {
   const locale = useLocale();
-  // Ensure value is always an array
   const selectedValues = Array.isArray(value) ? value : [];
 
   const handleChange = (checked: boolean, optionId: string) => {
@@ -55,17 +57,21 @@ export const MultipleChoiceQuestion: React.FC<QuestionProps> = ({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {question.options.map((option: OptionData) => (
-        <div key={option.id} className="flex items-center space-x-2">
+        <div key={option.id} className="flex items-start space-x-3">
           <Checkbox
             id={option.id}
             checked={selectedValues.includes(option.id)}
             onCheckedChange={(checked) =>
               handleChange(checked as boolean, option.id)
             }
+            className="mt-0.5"
           />
-          <Label htmlFor={option.id} className="text-sm font-normal">
+          <Label
+            htmlFor={option.id}
+            className="text-sm sm:text-base font-normal leading-tight"
+          >
             {option.textI18n[locale as keyof I18nText]}
           </Label>
         </div>
@@ -84,12 +90,19 @@ export const RatingQuestion: React.FC<QuestionProps> = ({
     <RadioGroup
       value={value?.toString()}
       onValueChange={(val) => onChange(Number(val))}
-      className="flex space-x-4"
+      className="flex flex-wrap gap-6 justify-center sm:justify-start"
     >
       {ratings.map((rating) => (
-        <div key={rating} className="flex flex-col items-center space-y-1">
-          <RadioGroupItem value={rating.toString()} id={`rating-${rating}`} />
-          <Label htmlFor={`rating-${rating}`} className="text-sm">
+        <div key={rating} className="flex flex-col items-center space-y-2">
+          <RadioGroupItem
+            value={rating.toString()}
+            id={`rating-${rating}`}
+            className="h-6 w-6 sm:h-5 sm:w-5"
+          />
+          <Label
+            htmlFor={`rating-${rating}`}
+            className="text-sm sm:text-base font-medium"
+          >
             {rating}
           </Label>
         </div>

@@ -160,24 +160,24 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-12 font-sans">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-3xl text-center">
+    <div className="max-w-3xl mx-auto space-y-6 sm:space-y-12 p-4 sm:p-0 font-sans">
+      <Card className="shadow-sm">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-2xl sm:text-3xl text-center">
             {survey.titleI18n[locale as keyof I18nText]}
           </CardTitle>
           {survey.descriptionI18n && (
-            <CardDescription className="text-lg text-center mt-2">
+            <CardDescription className="text-base sm:text-lg text-center mt-2">
               {survey.descriptionI18n[locale as keyof I18nText]}
             </CardDescription>
           )}
         </CardHeader>
       </Card>
 
-      <div className="space-y-10">
-        <div className="relative">
+      <div className="space-y-6 sm:space-y-10">
+        <div className="relative px-1">
           <Progress value={progress} className="h-2" />
-          <span className="absolute right-0 top-4 text-sm text-gray-500">
+          <span className="absolute right-0 top-4 text-xs sm:text-sm text-gray-500">
             {t("question", {
               current: currentQuestionIndex + 1,
               total: sortedQuestions.length,
@@ -186,7 +186,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
         </div>
 
         {error && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" className="mx-1">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
@@ -196,20 +196,22 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <Card
               className={cn(
-                "transition-all duration-300 transform",
+                "transition-all duration-300 transform shadow-sm",
                 form.formState.errors[currentQuestion.id] &&
                   "border-red-500 shadow-[0_0_0_1px_rgba(239,68,68,1)]"
               )}
             >
-              <CardHeader className="pb-4">
-                <CardTitle className="text-2xl">
+              <CardHeader className="pb-2 sm:pb-4 p-4 sm:p-6">
+                <CardTitle className="text-xl sm:text-2xl leading-tight">
                   {currentQuestion.textI18n[locale as keyof I18nText]}
                   {currentQuestion.required && (
-                    <span className="text-red-500 text-lg ml-1">*</span>
+                    <span className="text-red-500 text-base sm:text-lg ml-1">
+                      *
+                    </span>
                   )}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-4">
+              <CardContent className="p-4 sm:p-6 pt-2 sm:pt-4">
                 <FormField
                   control={form.control}
                   name={currentQuestion.id}
@@ -228,15 +230,15 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
                   )}
                 />
               </CardContent>
-              <CardFooter className="flex justify-between pt-6">
+              <CardFooter className="flex justify-between p-4 sm:p-6 pt-4 sm:pt-6 space-x-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handlePrevious}
                   disabled={isFirstQuestion}
-                  className="w-[100px]"
+                  className="min-w-[90px] sm:w-[100px] text-sm"
                 >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  <ArrowLeft className="h-4 w-4 mr-2" />
                   {t("buttons.back")}
                 </Button>
                 {isLastQuestion ? (
@@ -244,7 +246,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
                     type="submit"
                     disabled={isSubmitting || !canProceed}
                     className={cn(
-                      "w-[100px]",
+                      "min-w-[90px] sm:w-[100px] text-sm",
                       !canProceed && "opacity-50 cursor-not-allowed"
                     )}
                   >
@@ -258,12 +260,12 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
                     onClick={handleNext}
                     disabled={!canProceed}
                     className={cn(
-                      "w-[100px]",
+                      "min-w-[90px] sm:w-[100px] text-sm",
                       !canProceed && "opacity-50 cursor-not-allowed"
                     )}
                   >
                     {t("buttons.next")}
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 )}
               </CardFooter>
