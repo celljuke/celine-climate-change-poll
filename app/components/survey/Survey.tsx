@@ -5,6 +5,7 @@ import { useLocale } from "next-intl";
 import { QuestionComponent } from "./QuestionTypes";
 import { SurveyData, Answer, I18nText } from "./types";
 import { hasTakenSurvey, markSurveyAsTaken } from "./utils";
+import { useConfetti } from "@/app/hooks/useConfetti";
 
 interface SurveyProps {
   survey: SurveyData;
@@ -19,6 +20,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const locale = useLocale();
+  const { fireConfetti } = useConfetti();
   // Check if user has already taken the survey
   if (hasTakenSurvey(survey.id)) {
     return (
@@ -90,6 +92,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
       await onSubmit(formattedAnswers);
       markSurveyAsTaken(survey.id);
       setSubmitted(true);
+      fireConfetti();
     } catch (err) {
       setError(
         "An error occurred while submitting the survey. Please try again."
@@ -102,17 +105,20 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
 
   if (submitted) {
     return (
-      <div className="p-6 bg-green-50 rounded-lg">
-        <p className="text-center text-green-600">
-          Thank you for completing the survey! Your responses have been
-          recorded.
+      <div className="p-6 bg-green-50 rounded-lg text-center">
+        <h2 className="text-2xl font-bold text-green-600 mb-2">
+          🎉 Thank You! 🎉
+        </h2>
+        <p className="text-green-600">
+          Your responses have been recorded. We appreciate your participation in
+          making our planet a better place!
         </p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
+    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow font-sans">
       <h1 className="text-2xl font-bold mb-4">
         {survey.titleI18n[locale as keyof I18nText]}
       </h1>
@@ -152,7 +158,7 @@ export const Survey: React.FC<SurveyProps> = ({ survey, onSubmit }) => {
             isSubmitting
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700"
-          } text-white font-medium`}
+          } text-white font-medium transition-colors duration-200`}
         >
           {isSubmitting ? "Submitting..." : "Submit Survey"}
         </button>

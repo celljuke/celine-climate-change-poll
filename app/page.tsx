@@ -17,7 +17,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-fuchsia-50">
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-fuchsia-50 font-sans">
       {/* Hero Section */}
       <section className="px-4 pt-20 pb-16 text-center">
         <div className="container flex justify-center mx-auto py-8">
@@ -30,7 +30,7 @@ export default function Home() {
           />
         </div>
         <div className="max-w-3xl mx-auto space-y-8">
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-emerald-600 via-fuchsia-500 to-purple-600 text-transparent bg-clip-text">
+          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-emerald-600 via-fuchsia-500  to-blue-600 text-transparent bg-clip-text font-sans">
             {t("title")}
           </h1>
           <p className="text-lg md:text-xl text-gray-600">{t("description")}</p>
@@ -73,7 +73,7 @@ export default function Home() {
             </Card>
             <Card className="p-6 backdrop-blur-sm bg-white/80 border-2 hover:border-purple-500 transition-colors">
               <div className="space-y-4">
-                <Users className="h-12 w-12 text-purple-500" />
+                <Users className="h-12 w-12 text-blue-500" />
                 <h3 className="text-2xl font-bold">
                   {t("stats.people.value")}
                 </h3>
