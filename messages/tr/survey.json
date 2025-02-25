@@ -10,7 +10,8 @@
     "back": "Geri",
     "next": "İleri",
     "submit": "Gönder",
-    "submitting": "Gönderiliyor..."
+    "submitting": "Gönderiliyor...",
+    "backToHome": "Ana sayfaya dön"
   },
   "errors": {
     "questionNotFound": "Soru bulunamadı: {id}"

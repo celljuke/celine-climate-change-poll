@@ -4,9 +4,12 @@ import { motion } from "motion/react";
 import { Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useTranslations } from "next-intl";
+import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
 
 export default function SurveyCompleted() {
   const t = useTranslations("survey");
+  const router = useRouter();
   const colors = [
     "#FF6B6B", // coral
     "#4ECDC4", // turquoise
@@ -17,7 +20,7 @@ export default function SurveyCompleted() {
   ];
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
+    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4 space-y-4">
       <Card className="relative w-full max-w-md overflow-hidden p-6 sm:p-8 text-center">
         {/* Rainbow gradient background */}
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#FF6B6B] via-[#4ECDC4] to-[#FFD93D] opacity-20" />
@@ -168,6 +171,9 @@ export default function SurveyCompleted() {
           </div>
         </motion.div>
       </Card>
+      <Button onClick={() => router.push("/")}>
+        {t("buttons.backToHome")}
+      </Button>
     </div>
   );
 }

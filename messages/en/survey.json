@@ -10,7 +10,8 @@
     "back": "Back",
     "next": "Next",
     "submit": "Submit",
-    "submitting": "Submitting..."
+    "submitting": "Submitting...",
+    "backToHome": "Back to home"
   },
   "errors": {
     "questionNotFound": "Question {id} not found"
