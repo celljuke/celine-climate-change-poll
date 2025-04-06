@@ -435,41 +435,50 @@ const RatingQuestionResult = ({
             <CardTitle>Rating Distribution</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-64">
-              <ChartContainer
-                config={{
-                  "1": { color: COLORS[0] },
-                  "2": { color: COLORS[1] },
-                  "3": { color: COLORS[2] },
-                  "4": { color: COLORS[3] },
-                  "5": { color: COLORS[4] },
+            <ChartContainer
+              config={{
+                "1": { color: COLORS[0] },
+                "2": { color: COLORS[1] },
+                "3": { color: COLORS[2] },
+                "4": { color: COLORS[3] },
+                "5": { color: COLORS[4] },
+              }}
+            >
+              <BarChart
+                data={chartData}
+                margin={{
+                  top: 12,
+                  right: 12,
+                  left: 12,
+                  bottom: 12,
                 }}
               >
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <ChartTooltip
-                    content={
-                      <ChartTooltipContent
-                        formatter={(value, name, props) => [
-                          `${props.payload.percentage} (${value} responses)`,
-                          `Rating ${name}`,
-                        ]}
-                      />
-                    }
-                  />
-                  <Bar dataKey="value" fill="#8884d8">
-                    {chartData.map((entry) => (
-                      <Cell key={`cell-${entry.name}`} fill={entry.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ChartContainer>
-            </div>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                  dataKey="name"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                />
+                <YAxis tickLine={false} axisLine={false} tickMargin={8} />
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      formatter={(value, name, props) => [
+                        `${props.payload.percentage} (${value} responses)`,
+                        `Rating ${name}`,
+                      ]}
+                    />
+                  }
+                />
+                <Bar dataKey="value" fill="#8884d8">
+                  {chartData.map((entry) => (
+                    <Cell key={`cell-${entry.name}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ChartContainer>
           </CardContent>
         </Card>
 
@@ -540,43 +549,49 @@ const SingleChoiceQuestionResult = ({
             <CardTitle>Response Distribution</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-64">
-              <ChartContainer
-                config={chartData.reduce((acc, item) => {
-                  acc[item.name] = { color: item.color };
-                  return acc;
-                }, {} as Record<string, { color: string }>)}
+            <ChartContainer
+              config={chartData.reduce((acc, item) => {
+                acc[item.name] = { color: item.color };
+                return acc;
+              }, {} as Record<string, { color: string }>)}
+            >
+              <PieChart
+                margin={{
+                  top: 12,
+                  right: 12,
+                  left: 12,
+                  bottom: 12,
+                }}
               >
-                <PieChart>
-                  <Pie
-                    data={chartData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) =>
-                      `${name}: ${(percent * 100).toFixed(0)}%`
-                    }
-                  >
-                    {chartData.map((entry) => (
-                      <Cell key={`cell-${entry.name}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <ChartTooltip
-                    content={
-                      <ChartTooltipContent
-                        formatter={(value, name, props) => [
-                          `${props.payload.percentage} (${value} responses)`,
-                          name,
-                        ]}
-                      />
-                    }
-                  />
-                </PieChart>
-              </ChartContainer>
-            </div>
+                <Pie
+                  data={chartData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={100}
+                  fill="#8884d8"
+                  dataKey="value"
+                  label={({ name, percent }) =>
+                    `${name}: ${(percent * 100).toFixed(0)}%`
+                  }
+                >
+                  {chartData.map((entry) => (
+                    <Cell key={`cell-${entry.name}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      formatter={(value, name, props) => [
+                        `${props.payload.percentage} (${value} responses)`,
+                        name,
+                      ]}
+                    />
+                  }
+                />
+              </PieChart>
+            </ChartContainer>
           </CardContent>
         </Card>
 
@@ -645,39 +660,55 @@ const MultipleChoiceQuestionResult = ({
             <CardTitle>Response Distribution</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-64">
-              <ChartContainer
-                config={chartData.reduce((acc, item) => {
-                  acc[item.name] = { color: item.color };
-                  return acc;
-                }, {} as Record<string, { color: string }>)}
+            <ChartContainer
+              config={chartData.reduce((acc, item) => {
+                acc[item.name] = { color: item.color };
+                return acc;
+              }, {} as Record<string, { color: string }>)}
+            >
+              <BarChart
+                data={chartData}
+                layout="vertical"
+                margin={{
+                  top: 12,
+                  right: 12,
+                  left: 150,
+                  bottom: 12,
+                }}
               >
-                <BarChart
-                  data={chartData}
-                  layout="vertical"
-                  margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={90} />
-                  <ChartTooltip
-                    content={
-                      <ChartTooltipContent
-                        formatter={(value, name, props) => [
-                          `${props.payload.percentage} (${value} responses)`,
-                          name,
-                        ]}
-                      />
-                    }
-                  />
-                  <Bar dataKey="value" fill="#8884d8">
-                    {chartData.map((entry) => (
-                      <Cell key={`cell-${entry.name}`} fill={entry.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ChartContainer>
-            </div>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                  type="number"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                />
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  width={140}
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      formatter={(value, name, props) => [
+                        `${props.payload.percentage} (${value} responses)`,
+                        name,
+                      ]}
+                    />
+                  }
+                />
+                <Bar dataKey="value" fill="#8884d8">
+                  {chartData.map((entry) => (
+                    <Cell key={`cell-${entry.name}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ChartContainer>
           </CardContent>
         </Card>
 
