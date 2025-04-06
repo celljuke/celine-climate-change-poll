@@ -1,5 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { SurveyData, Answer, I18nText } from "@/app/components/survey/types";
+import {
+  SurveyData,
+  Answer,
+  I18nText,
+  SurveyResults,
+} from "@/app/components/survey/types";
 
 export async function getSurvey(surveyId: string): Promise<SurveyData | null> {
   const survey = await prisma.survey.findUnique({
@@ -60,4 +65,27 @@ export async function submitSurveyResponse(
     const error = await response.json();
     throw new Error(error.message || "Failed to submit survey");
   }
+}
+
+export async function getSurveyResults(
+  surveyId: string
+): Promise<SurveyResults> {
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+
+  const response = await fetch(
+    `${origin}/api/surveys/results?surveyId=${surveyId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Failed to fetch survey results");
+  }
+
+  return response.json();
 }
