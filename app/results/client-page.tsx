@@ -484,27 +484,99 @@ const RatingQuestionResult = ({
 
         <Card>
           <CardHeader>
-            <CardTitle>Average Rating</CardTitle>
+            <CardTitle>Analysis</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col items-center justify-center h-64">
-            <div className="text-6xl font-bold text-primary mb-4">
-              {averageRating.toFixed(1)}
+          <CardContent className="flex flex-col h-64 overflow-y-auto">
+            <div className="mb-6">
+              <h4 className="font-semibold mb-2">Average Rating</h4>
+              <div className="text-4xl font-bold text-primary mb-2">
+                {averageRating.toFixed(1)}
+              </div>
+              <div className="text-sm text-muted-foreground">out of 5</div>
             </div>
-            <div className="text-xl text-muted-foreground">out of 5</div>
-            <div className="mt-8 space-y-2">
-              {insights.map((insight) => (
-                <p
-                  key={insight}
-                  className="text-sm"
-                  dangerouslySetInnerHTML={{ __html: insight }}
-                />
-              ))}
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold mb-2">Statistical Insights</h4>
+                <div className="space-y-2">
+                  {insights.map((insight) => (
+                    <p
+                      key={insight}
+                      className="text-sm"
+                      dangerouslySetInnerHTML={{ __html: insight }}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-2">AI Analysis</h4>
+                <AIAnalysis result={result} locale={locale} />
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
     </motion.div>
   );
+};
+
+// Update the AIAnalysis component
+const AIAnalysis = ({
+  result,
+  locale,
+}: {
+  result: QuestionResult;
+  locale: string;
+}) => {
+  const [analysis, setAnalysis] = useState<string>("Loading AI analysis...");
+
+  useEffect(() => {
+    const fetchAnalysis = async () => {
+      try {
+        const response = await fetch("/api/analysis", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            questionText: getLocalizedText(result.textI18n, locale),
+            totalResponses: result.totalAnswers,
+            data: result.data,
+            type: result.type,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch analysis");
+        }
+
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+        let analysisText = "";
+
+        if (reader) {
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              const text = decoder.decode(value);
+              analysisText += text;
+              setAnalysis(analysisText);
+            }
+          } finally {
+            reader.releaseLock();
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching analysis:", error);
+        setAnalysis("AI analysis currently unavailable.");
+      }
+    };
+
+    fetchAnalysis();
+  }, [result, locale]);
+
+  return <div className="text-sm prose prose-sm max-w-none">{analysis}</div>;
 };
 
 // Component to render a single choice question result
@@ -597,17 +669,26 @@ const SingleChoiceQuestionResult = ({
 
         <Card>
           <CardHeader>
-            <CardTitle>Insights</CardTitle>
+            <CardTitle>Analysis</CardTitle>
           </CardHeader>
           <CardContent className="h-64 overflow-y-auto">
-            <div className="space-y-2">
-              {insights.map((insight) => (
-                <p
-                  key={insight}
-                  className="text-sm"
-                  dangerouslySetInnerHTML={{ __html: insight }}
-                />
-              ))}
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold mb-2">Statistical Insights</h4>
+                <div className="space-y-2">
+                  {insights.map((insight) => (
+                    <p
+                      key={insight}
+                      className="text-sm"
+                      dangerouslySetInnerHTML={{ __html: insight }}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-2">AI Analysis</h4>
+                <AIAnalysis result={result} locale={locale} />
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -714,17 +795,26 @@ const MultipleChoiceQuestionResult = ({
 
         <Card>
           <CardHeader>
-            <CardTitle>Insights</CardTitle>
+            <CardTitle>Analysis</CardTitle>
           </CardHeader>
           <CardContent className="h-64 overflow-y-auto">
-            <div className="space-y-2">
-              {insights.map((insight) => (
-                <p
-                  key={insight}
-                  className="text-sm"
-                  dangerouslySetInnerHTML={{ __html: insight }}
-                />
-              ))}
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold mb-2">Statistical Insights</h4>
+                <div className="space-y-2">
+                  {insights.map((insight) => (
+                    <p
+                      key={insight}
+                      className="text-sm"
+                      dangerouslySetInnerHTML={{ __html: insight }}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-2">AI Analysis</h4>
+                <AIAnalysis result={result} locale={locale} />
+              </div>
             </div>
           </CardContent>
         </Card>
