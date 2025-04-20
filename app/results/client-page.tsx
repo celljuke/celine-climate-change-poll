@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocale } from "next-intl";
 import { getSurveyResults } from "../services/survey";
 import { SurveyResults, QuestionResult } from "../components/survey/types";
@@ -528,10 +528,19 @@ const AIAnalysis = ({
   locale: string;
 }) => {
   const [analysis, setAnalysis] = useState<string>("Loading AI analysis...");
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     const fetchAnalysis = async () => {
       try {
+        // Cancel any ongoing request
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+
+        // Create new AbortController for this request
+        abortControllerRef.current = new AbortController();
+
         const response = await fetch("/api/analysis", {
           method: "POST",
           headers: {
@@ -542,39 +551,57 @@ const AIAnalysis = ({
             totalResponses: result.totalAnswers,
             data: result.data,
             type: result.type,
+            locale,
           }),
+          signal: abortControllerRef.current.signal,
         });
 
         if (!response.ok) {
           throw new Error("Failed to fetch analysis");
         }
 
-        const reader = response.body?.getReader();
-        const decoder = new TextDecoder();
-        let analysisText = "";
-
-        if (reader) {
-          try {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-
-              const text = decoder.decode(value);
-              analysisText += text;
-              setAnalysis(analysisText);
-            }
-          } finally {
-            reader.releaseLock();
-          }
+        const text = await response.text();
+        if (!abortControllerRef.current.signal.aborted) {
+          // Cache the result with the locale
+          const cacheKey = `${result.id}-${locale}`;
+          sessionStorage.setItem(cacheKey, text);
+          setAnalysis(text);
         }
       } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") {
+          // Ignore abort errors
+          return;
+        }
         console.error("Error fetching analysis:", error);
         setAnalysis("AI analysis currently unavailable.");
       }
     };
 
-    fetchAnalysis();
-  }, [result, locale]);
+    // Create a cache key based on the question data
+    const cacheKey = `${result.id}-${locale}`;
+
+    // Check if we have a cached result
+    const cachedAnalysis = sessionStorage.getItem(cacheKey);
+    if (cachedAnalysis) {
+      setAnalysis(cachedAnalysis);
+    } else {
+      fetchAnalysis();
+    }
+
+    return () => {
+      // Cleanup: abort any ongoing request when component unmounts or dependencies change
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [
+    result.id,
+    result.textI18n,
+    result.totalAnswers,
+    result.data,
+    result.type,
+    locale,
+  ]);
 
   return <div className="text-sm prose prose-sm max-w-none">{analysis}</div>;
 };
